@@ -5,7 +5,6 @@
 
 #include "control/controlproxy.h"
 #include "library/dao/playlistdao.h"
-#include "library/library_decl.h"
 #include "library/trackmodel.h" // Can't forward declare enums
 #include "preferences/usersettings.h"
 #include "util/duration.h"
@@ -35,15 +34,16 @@ class WTrackTableView : public WLibraryTableView {
     bool hasFocus() const override;
     void setFocus() override;
     void keyPressEvent(QKeyEvent* event) override;
-    void loadSelectedTrack() override;
+    void activateSelectedTrack() override;
     void loadSelectedTrackToGroup(const QString& group, bool play) override;
     void assignNextTrackColor() override;
     void assignPreviousTrackColor() override;
     TrackModel::SortColumnId getColumnIdFromCurrentIndex() override;
     QList<TrackId> getSelectedTrackIds() const;
+    bool isTrackInCurrentView(const TrackId& trackId);
     void setSelectedTracks(const QList<TrackId>& tracks);
     TrackId getCurrentTrackId() const;
-    bool setCurrentTrackId(const TrackId& trackId, int column = 0);
+    bool setCurrentTrackId(const TrackId& trackId, int column = 0, bool scrollToTrack = false);
 
     double getBackgroundColorOpacity() const {
         return m_backgroundColorOpacity;
@@ -55,7 +55,7 @@ class WTrackTableView : public WLibraryTableView {
     }
 
   signals:
-    void trackTableFocusChange(FocusWidget newFocusWidget);
+    void trackMenuVisible(bool visible);
 
   public slots:
     void loadTrackModel(QAbstractItemModel* model, bool restoreState = false);
@@ -63,6 +63,7 @@ class WTrackTableView : public WLibraryTableView {
     void slotUnhide();
     void slotPurge();
     void slotDeleteTracksFromDisk();
+    void slotShowHideTrackMenu(bool show);
 
     void slotAddToAutoDJBottom() override;
     void slotAddToAutoDJTop() override;
@@ -73,10 +74,7 @@ class WTrackTableView : public WLibraryTableView {
     bool slotRestoreCurrentViewState() {
         return restoreCurrentViewState();
     };
-
-  protected:
-    void focusInEvent(QFocusEvent* event) override;
-    void focusOutEvent(QFocusEvent* event) override;
+    void slotSelectTrack(const TrackId&);
 
   private slots:
     void doSortByColumn(int headerSection, Qt::SortOrder sortOrder);

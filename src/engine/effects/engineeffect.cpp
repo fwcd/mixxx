@@ -53,16 +53,16 @@ EffectState* EngineEffect::createState(const mixxx::EngineParameters& enginePara
     return m_pProcessor->createState(engineParameters);
 }
 
-void EngineEffect::loadStatesForInputChannel(const ChannelHandle* inputChannel,
+void EngineEffect::loadStatesForInputChannel(ChannelHandle inputChannel,
         EffectStatesMap* pStatesMap) {
     if (kEffectDebugOutput) {
         qDebug() << "EngineEffect::loadStatesForInputChannel" << this
-                 << "loading states for input" << *inputChannel;
+                 << "loading states for input" << inputChannel;
     }
     m_pProcessor->loadStatesForInputChannel(inputChannel, pStatesMap);
 }
 
-void EngineEffect::deleteStatesForInputChannel(const ChannelHandle* inputChannel) {
+void EngineEffect::deleteStatesForInputChannel(ChannelHandle inputChannel) {
     m_pProcessor->deleteStatesForInputChannel(inputChannel);
 }
 
@@ -151,7 +151,7 @@ bool EngineEffect::process(const ChannelHandle& inputHandle,
             m_effectEnableStateForChannelMatrix[inputHandle][outputHandle];
 
     // If the EngineEffect is fully disabled, do not let
-    // intermediate enabling/disabing signals from the chain override
+    // intermediate enabling/disabling signals from the chain override
     // the EngineEffect's state.
     if (effectiveEffectEnableState != EffectEnableState::Disabled) {
         if (chainEnableState == EffectEnableState::Disabled) {

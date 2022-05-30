@@ -6,8 +6,8 @@ import QtQuick.Window 2.12
 Item {
     id: root
 
-    property string group // required
-    property string key // required
+    required property string group
+    required property string key
     property string color: "white"
 
     Shape {
@@ -43,9 +43,9 @@ Item {
 
         group: root.group
         key: root.key
-        onValueChanged: {
+        onValueChanged: (value) => {
             // Math.round saves tons of CPU by avoiding redrawing for fractional pixel positions.
-            marker.x = Math.round(parent.width * value * Screen.devicePixelRatio) / Screen.devicePixelRatio;
+            marker.x = Math.round(root.width * value * Screen.devicePixelRatio) / Screen.devicePixelRatio;
         }
     }
 

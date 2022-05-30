@@ -7,8 +7,8 @@ Item {
     id: root
 
     property Mixxx.EffectSlotProxy slot: Mixxx.EffectsManager.getEffectSlot(unitNumber, effectNumber)
-    property int unitNumber // required
-    property int effectNumber // required
+    required property int unitNumber
+    required property int effectNumber
     property bool expanded: false
     readonly property string group: slot.group
     property real maxSelectorWidth: 300
@@ -48,7 +48,7 @@ Item {
             anchors.margins: 5
             textRole: "display"
             model: Mixxx.EffectsManager.visibleEffectsModel
-            onActivated: {
+            onActivated: (index) => {
                 const effectId = model.get(index).effectId;
                 if (root.slot.effectId != effectId)
                     root.slot.effectId = effectId;
@@ -62,7 +62,7 @@ Item {
                     // TODO: Consider using an additional QHash in the
                     // model and provide a more efficient lookup method
                     for (let i = 0; i < rowCount; i++) {
-                        if (effectSelector.model.get(i).effectId === target.effectId) {
+                        if (effectSelector.model.get(i).effectId === root.slot.effectId) {
                             effectSelector.currentIndex = i;
                             break;
                         }
@@ -107,10 +107,14 @@ Item {
         delegate: Item {
             id: parameter
 
+            required property int index
+            required property string shortName
+            required property string name
+            required property string controlKey
+            required property int type
             property int number: index + 1
             // TODO: Use null coalescing when we switch to Qt >= 5.15
-            property string label: shortName ? shortName : name
-            property string key: controlKey
+            property string label: shortName ?? name
             property bool isKnob: type == 0
             property bool isButton: type == 1
 
@@ -132,7 +136,7 @@ Item {
                 anchors.centerIn: parent
                 arcStart: 0
                 group: root.group
-                key: parameter.key
+                key: parameter.controlKey
                 color: Theme.effectColor
                 visible: parameter.isKnob
 
@@ -142,7 +146,7 @@ Item {
                     property bool loaded: value != 0
 
                     group: root.group
-                    key: parameter.key + "_loaded"
+                    key: parameter.controlKey + "_loaded"
                 }
 
             }
@@ -154,7 +158,7 @@ Item {
                 width: parent.width
                 anchors.centerIn: parent
                 group: root.group
-                key: parameter.key
+                key: parameter.controlKey
                 activeColor: Theme.effectColor
                 visible: parameter.isButton
                 toggleable: true
@@ -166,7 +170,7 @@ Item {
                     property bool loaded: value != 0
 
                     group: root.group
-                    key: parameter.key + "_loaded"
+                    key: parameter.controlKey + "_loaded"
                 }
 
             }

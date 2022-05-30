@@ -36,7 +36,6 @@ class TrackModel;
 class WSearchLineEdit;
 class WLibrarySidebar;
 class WLibrary;
-class WLibraryTextBrowser;
 
 #ifdef __ENGINEPRIME__
 namespace mixxx {
@@ -74,12 +73,13 @@ class Library: public QObject {
     void bindSidebarWidget(WLibrarySidebar* sidebarWidget);
     void bindLibraryWidget(WLibrary* libraryWidget,
                     KeyboardEventFilter* pKeyboard);
-    void bindFeatureRootView(WLibraryTextBrowser* pTextBrowser);
 
     void addFeature(LibraryFeature* feature);
 
     /// Needed for exposing models to QML
     LibraryTableModel* trackTableModel() const;
+
+    bool isTrackIdInCurrentLibraryView(const TrackId& trackId);
 
     int getTrackTableRowHeight() const {
         return m_iTrackTableRowHeight;
@@ -110,7 +110,7 @@ class Library: public QObject {
     void slotSwitchToView(const QString& view);
     void slotLoadTrack(TrackPointer pTrack);
     void slotLoadTrackToPlayer(TrackPointer pTrack, const QString& group, bool play);
-    void slotLoadLocationToPlayer(const QString& location, const QString& group);
+    void slotLoadLocationToPlayer(const QString& location, const QString& group, bool play);
     void slotRefreshLibraryModels();
     void slotCreatePlaylist();
     void slotCreateCrate();
@@ -129,6 +129,7 @@ class Library: public QObject {
     void disableSearch();
     // emit this signal to enable/disable the cover art widget
     void enableCoverArtDisplay(bool);
+    void selectTrack(const TrackId&);
     void trackSelected(TrackPointer pTrack);
 #ifdef __ENGINEPRIME__
     void exportLibrary();
@@ -159,6 +160,7 @@ class Library: public QObject {
     QList<LibraryFeature*> m_features;
     const static QString m_sTrackViewName;
     const static QString m_sAutoDJViewName;
+    WLibrary* m_pLibraryWidget;
     MixxxLibraryFeature* m_pMixxxLibraryFeature;
     PlaylistFeature* m_pPlaylistFeature;
     CrateFeature* m_pCrateFeature;

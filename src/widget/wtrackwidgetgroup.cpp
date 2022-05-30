@@ -24,7 +24,8 @@ constexpr WTrackMenu::Features kTrackMenuFeatures =
         WTrackMenu::Feature::Color |
         WTrackMenu::Feature::FileBrowser |
         WTrackMenu::Feature::Properties |
-        WTrackMenu::Feature::UpdateReplayGain;
+        WTrackMenu::Feature::UpdateReplayGainFromPregain |
+        WTrackMenu::Feature::SelectInLibrary;
 
 } // anonymous namespace
 
@@ -124,10 +125,6 @@ void WTrackWidgetGroup::contextMenuEvent(QContextMenuEvent* event) {
     if (m_pCurrentTrack) {
         m_pTrackMenu->loadTrack(m_pCurrentTrack, m_group);
         // Create the right-click menu
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-        m_pTrackMenu->popup(event->globalPosition().toPoint());
-#else
         m_pTrackMenu->popup(event->globalPos());
-#endif
     }
 }

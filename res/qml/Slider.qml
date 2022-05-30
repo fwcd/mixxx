@@ -1,6 +1,5 @@
-import "." as Skin
 import Mixxx.Controls 0.1 as MixxxControls
-import QtGraphicalEffects 1.12
+import Qt5Compat.GraphicalEffects
 import QtQuick 2.12
 import "Theme"
 
@@ -11,7 +10,6 @@ MixxxControls.Slider {
     property alias bg: backgroundImage.source
 
     bar: true
-    barColor: Theme.sliderBarColor
     barMargin: 10
     implicitWidth: backgroundImage.implicitWidth
     implicitHeight: backgroundImage.implicitHeight

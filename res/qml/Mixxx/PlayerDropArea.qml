@@ -3,10 +3,10 @@ import QtQuick 2.12
 
 // Handles drops on decks and samplers
 DropArea {
-    property string group // required
+    required property string group
     property var player: Mixxx.PlayerManager.getPlayer(group)
 
-    onDropped: {
+    onDropped: (drop) => {
         if (drop.formats.includes("mixxx/player")) {
             const sourceGroup = drop.getDataAsString("mixxx/player");
             // Prevent dropping a deck onto itself

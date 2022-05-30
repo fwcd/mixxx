@@ -7,6 +7,7 @@
 #include "controllers/keyboard/keyboardeventfilter.h"
 #include "library/export/trackexportwizard.h"
 #include "library/library.h"
+#include "library/library_prefs.h"
 #include "library/parser.h"
 #include "library/parsercsv.h"
 #include "library/parserm3u.h"
@@ -30,6 +31,8 @@ const ConfigKey kConfigKeyLastImportExportPlaylistDirectory(
         "[Library]", "LastImportExportPlaylistDirectory");
 
 } // anonymous namespace
+
+using namespace mixxx::library::prefs;
 
 BasePlaylistFeature::BasePlaylistFeature(
         Library* pLibrary,
@@ -410,6 +413,15 @@ void BasePlaylistFeature::slotDeletePlaylist() {
 
     int siblingId = getSiblingPlaylistIdOf(m_lastRightClickedIndex);
 
+    QMessageBox::StandardButton btn = QMessageBox::question(nullptr,
+            tr("Confirm Deletion"),
+            tr("Do you really want to delete this playlist?"),
+            QMessageBox::Yes | QMessageBox::No,
+            QMessageBox::No);
+    if (btn == QMessageBox::No) {
+        return;
+    }
+
     m_playlistDao.deletePlaylist(playlistId);
 
     if (siblingId == kInvalidPlaylistId) {
@@ -431,7 +443,7 @@ void BasePlaylistFeature::slotImportPlaylist() {
 
     // Update the import/export playlist directory
     QString fileDirectory(playlistFile);
-    fileDirectory.truncate(playlistFile.lastIndexOf(QDir::separator()));
+    fileDirectory.truncate(playlistFile.lastIndexOf("/"));
     m_pConfig->set(kConfigKeyLastImportExportPlaylistDirectory,
             ConfigValue(fileDirectory));
 
@@ -459,7 +471,7 @@ void BasePlaylistFeature::slotCreateImportPlaylist() {
 
     // Set last import directory
     QString fileDirectory(playlistFiles.first());
-    fileDirectory.truncate(playlistFiles.first().lastIndexOf(QDir::separator()));
+    fileDirectory.truncate(playlistFiles.first().lastIndexOf("/"));
     m_pConfig->set(kConfigKeyLastImportExportPlaylistDirectory,
             ConfigValue(fileDirectory));
 
@@ -533,7 +545,7 @@ void BasePlaylistFeature::slotExportPlaylist() {
 
     // Update the import/export playlist directory
     QString fileDirectory(fileLocation);
-    fileDirectory.truncate(fileLocation.lastIndexOf(QDir::separator()));
+    fileDirectory.truncate(fileLocation.lastIndexOf("/"));
     m_pConfig->set(kConfigKeyLastImportExportPlaylistDirectory,
             ConfigValue(fileDirectory));
 
@@ -559,7 +571,7 @@ void BasePlaylistFeature::slotExportPlaylist() {
 
     // check config if relative paths are desired
     bool useRelativePath = m_pConfig->getValue<bool>(
-            ConfigKey("[Library]", "UseRelativePathOnExport"));
+            kUseRelativePathOnExportConfigKey);
 
     if (fileLocation.endsWith(".csv", Qt::CaseInsensitive)) {
         ParserCsv::writeCSVFile(fileLocation, pPlaylistTableModel.data(), useRelativePath);
@@ -660,7 +672,6 @@ void BasePlaylistFeature::bindLibraryWidget(WLibrary* libraryWidget,
             this,
             &BasePlaylistFeature::htmlLinkClicked);
     libraryWidget->registerView(m_rootViewName, edit);
-    m_pLibrary->bindFeatureRootView(edit);
 }
 
 void BasePlaylistFeature::bindSidebarWidget(WLibrarySidebar* pSidebarWidget) {
