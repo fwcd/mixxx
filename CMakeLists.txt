@@ -40,7 +40,7 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED VCPKG_ROOT)
 endif()
 
 if(DEFINED VCPKG_ROOT)
-  set(X_VCPKG_APPLOCAL_DEPS_INSTALL TRUE)
+  set(X_VCPKG_APPLOCAL_DEPS_INSTALL ON CACHE BOOL "Automatically copy dependencies into the install target directory for executables." FORCE)
 
   if(NOT DEFINED VCPKG_OVERLAY_PORTS)
     set(VCPKG_OVERLAY_PORTS "${VCPKG_ROOT}/overlay/ports")
@@ -571,6 +571,7 @@ add_library(mixxx-lib STATIC EXCLUDE_FROM_ALL
   src/effects/backends/builtin/moogladder4filtereffect.cpp
   src/effects/backends/builtin/parametriceqeffect.cpp
   src/effects/backends/builtin/phasereffect.cpp
+  src/effects/backends/builtin/pitchshifteffect.cpp
   src/effects/backends/builtin/reverbeffect.cpp
   src/effects/backends/builtin/threebandbiquadeqeffect.cpp
   src/effects/backends/builtin/tremoloeffect.cpp
