@@ -28,9 +28,19 @@ def get_clang_format_config_with_columnlimit(rootdir, limit):
         text=True,
     )
     proc.check_returncode()
-    return re.sub(
-        r"(ColumnLimit:\s*)\d+", r"\g<1>{}".format(BREAK_BEFORE), proc.stdout
+
+    config = re.sub(
+        r"(ColumnLimit:\s*)\d+", r"\g<1>{}".format(limit), proc.stdout
     )
+
+    # Handle Objective-C and Objective-C++ separately
+    # (otherwise clang-format will complain that the generated config
+    # cannot format Objective-C code and fail the pre-commit checks)
+    config = "\n".join(
+        ["---", "Language: ObjC", "ColumnLimit: {}".format(limit), config]
+    )
+
+    return config
 
 
 def run_clang_format_on_lines(rootdir, file_to_format, stylepath=None):
