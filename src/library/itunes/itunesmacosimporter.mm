@@ -30,7 +30,8 @@ class ImporterImpl {
     void importPlaylists(NSArray<ITLibPlaylist*>* playlists) {
         QSqlQuery queryInsertToPlaylists(m_database);
         queryInsertToPlaylists.prepare(
-            "INSERT INTO itunes_playlists (id, name) VALUES (:id, :name)");
+            "INSERT INTO itunes_playlists (id, persistent_id, name) VALUES "
+            "(:id, :persistent_id, :name)");
 
         QSqlQuery queryInsertToPlaylistTracks(m_database);
         queryInsertToPlaylistTracks.prepare(
@@ -52,9 +53,9 @@ class ImporterImpl {
     void importMediaItems(NSArray<ITLibMediaItem*>* items) {
         QSqlQuery query(m_database);
         query.prepare(
-            "INSERT INTO itunes_library (id, artist, title, album, album_artist, "
+            "INSERT INTO itunes_library (id, persistent_id, artist, title, album, album_artist, "
             "genre, grouping, year, duration, location, rating, comment, "
-            "tracknumber, bpm, bitrate) VALUES (:id, :artist, :title, :album, "
+            "tracknumber, bpm, bitrate) VALUES (:id, :persistent_id, :artist, :title, :album, "
             ":album_artist, :genre, :grouping, :year, :duration, :location, "
             ":rating, :comment, :tracknumber, :bpm, :bitrate)");
 
@@ -169,6 +170,9 @@ class ImporterImpl {
             [playlist.name cStringUsingEncoding:NSUTF8StringEncoding]);
 
         queryInsertToPlaylists.bindValue(":id", playlistId);
+        queryInsertToPlaylists.bindValue(
+            ":persistent_id", [[playlist.persistentID stringValue]
+                                  cStringUsingEncoding:NSUTF8StringEncoding]);
         queryInsertToPlaylists.bindValue(":name", playlistName);
 
         if (!queryInsertToPlaylists.exec()) {
@@ -201,6 +205,9 @@ class ImporterImpl {
 
     void importMediaItem(ITLibMediaItem* item, QSqlQuery& query) {
         query.bindValue(":id", persistentIdToDbId(item.persistentID));
+        query.bindValue(":persistent_id",
+                        [[item.persistentID stringValue]
+                            cStringUsingEncoding:NSUTF8StringEncoding]);
         query.bindValue(":artist", [item.artist.name cStringUsingEncoding:NSUTF8StringEncoding]);
         query.bindValue(":title", [item.title cStringUsingEncoding:NSUTF8StringEncoding]);
         query.bindValue(":album", [item.album.title cStringUsingEncoding:NSUTF8StringEncoding]);

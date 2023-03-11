@@ -584,4 +584,16 @@ reapplying those migrations.
       UPDATE library SET filetype='aiff' WHERE filetype='aif';
     </sql>
   </revision>
+  <revision version="40" min_compatible="3">
+    <description>
+      Add a column for tracking the persistent ID of imported iTunes tracks and playlists.
+    </description>
+    <sql>
+      ALTER TABLE itunes_library ADD COLUMN persistent_id TEXT DEFAULT NULL;
+      ALTER TABLE itunes_playlists ADD COLUMN persistent_id TEXT DEFAULT NULL;
+
+      CREATE UNIQUE INDEX itunes_library_persistent_id_index ON itunes_library(persistent_id);
+      CREATE UNIQUE INDEX itunes_playlists_persistent_id_index ON itunes_playlists(persistent_id);
+    </sql>
+  </revision>
 </schema>
