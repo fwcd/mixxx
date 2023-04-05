@@ -29,6 +29,8 @@ class ITunesFeature : public BaseExternalLibraryFeature {
 
     QVariant title() override;
     void bindSidebarWidget(WLibrarySidebar* pSidebarWidget) override;
+    void bindLibraryWidget(WLibrary* pLibraryWidget,
+            KeyboardEventFilter* keyboard) override;
 
     TreeItemModel* sidebarModel() const override;
 

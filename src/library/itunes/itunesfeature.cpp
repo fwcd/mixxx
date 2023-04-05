@@ -15,6 +15,7 @@
 #include "library/baseexternaltrackmodel.h"
 #include "library/basetrackcache.h"
 #include "library/dao/settingsdao.h"
+#include "library/itunes/dlgitunes.h"
 #include "library/itunes/itunesimporter.h"
 #include "library/itunes/ituneslocalhosttoken.h"
 #include "library/itunes/itunesxmlimporter.h"
@@ -32,7 +33,8 @@
 
 namespace {
 
-const QString ITDB_PATH_KEY = "mixxx.itunesfeature.itdbpath";
+const QString kViewName = QStringLiteral("iTunes");
+const QString kItdbPathKey = "mixxx.itunesfeature.itdbpath";
 
 bool isMacOSImporterAvailable() {
 #ifdef __MACOS_ITUNES_LIBRARY__
@@ -160,7 +162,18 @@ void ITunesFeature::bindSidebarWidget(WLibrarySidebar* pSidebarWidget) {
     BaseExternalLibraryFeature::bindSidebarWidget(pSidebarWidget);
 }
 
+void ITunesFeature::bindLibraryWidget(WLibrary* pLibraryWidget,
+        KeyboardEventFilter* keyboard) {
+    // The view will be deleted by LibraryWidget
+    DlgITunes* pITunesView = new DlgITunes(pLibraryWidget, m_pConfig, m_pLibrary);
+    pLibraryWidget->registerView(kViewName, pITunesView);
+
+    // TODO: Wire it up
+}
+
 void ITunesFeature::activate() {
+    // TODO: Can we just switch like this?
+    emit switchToView(kViewName);
     activate(false);
     emit enableCoverArtDisplay(false);
 }
@@ -179,7 +192,7 @@ void ITunesFeature::activate(bool forceReload) {
         emit showTrackModel(m_pITunesTrackModel);
 
         SettingsDAO settings(m_pTrackCollection->database());
-        QString dbSetting(settings.getValue(ITDB_PATH_KEY));
+        QString dbSetting(settings.getValue(kItdbPathKey));
         // if a path exists in the database, use it
         if (!dbSetting.isEmpty() && QFile::exists(dbSetting)) {
             m_dbfile = dbSetting;
@@ -210,7 +223,7 @@ void ITunesFeature::activate(bool forceReload) {
                 // that we can access the folder on future runs. We need to canonicalize
                 // the path so we first wrap the directory string with a QDir.
                 Sandbox::createSecurityToken(&fileInfo);
-                settings.setValue(ITDB_PATH_KEY, m_dbfile);
+                settings.setValue(kItdbPathKey, m_dbfile);
             }
         }
         m_isActivated =  true;
@@ -260,7 +273,7 @@ void ITunesFeature::onRightClick(const QPoint& globalPos) {
     QAction *chosen(menu.exec(globalPos));
     if (chosen == &useDefault) {
         SettingsDAO settings(m_database);
-        settings.setValue(ITDB_PATH_KEY, QString());
+        settings.setValue(kItdbPathKey, QString());
         activate(true); // clears tables before parsing
     } else if (chosen == &chooseNew) {
         SettingsDAO settings(m_database);
@@ -277,7 +290,7 @@ void ITunesFeature::onRightClick(const QPoint& globalPos) {
         // the path so we first wrap the directory string with a QDir.
         Sandbox::createSecurityToken(&dbFileInfo);
 
-        settings.setValue(ITDB_PATH_KEY, dbfile);
+        settings.setValue(kItdbPathKey, dbfile);
         activate(true); // clears tables before parsing
     }
 }

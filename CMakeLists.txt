@@ -749,6 +749,8 @@ add_library(mixxx-lib STATIC EXCLUDE_FROM_ALL
   src/library/export/trackexportworker.cpp
   src/library/externaltrackcollection.cpp
   src/library/hiddentablemodel.cpp
+  src/library/itunes/dlgitunes.cpp
+  src/library/itunes/dlgitunes.ui
   src/library/itunes/itunesfeature.cpp
   src/library/itunes/itunesxmlimporter.cpp
   src/library/library_prefs.cpp
