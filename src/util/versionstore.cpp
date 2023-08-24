@@ -8,22 +8,12 @@
 #include <QtDebug>
 #include <QtGlobal>
 
-// shout.h checks for WIN32 to see if we are on Windows.
-#ifdef WIN64
-#define WIN32
-#endif
-#ifdef __BROADCAST__
-#include <shoutidjc/shout.h>
-#endif
-#ifdef WIN64
-#undef WIN32
-#endif
-
 #include <FLAC/format.h>
 #include <chromaprint.h>
 #include <lame/lame.h>
 #include <portaudio.h>
 #include <rubberband/RubberBandStretcher.h>
+#include <shoutidjc/shout.h>
 #include <sndfile.h>
 #include <taglib/taglib.h>
 #include <vorbis/codec.h>
