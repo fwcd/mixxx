@@ -106,7 +106,6 @@ if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
 endif()
 set(X_VCPKG_APPLOCAL_DEPS_INSTALL ON CACHE BOOL "Automatically copy dependencies into the install target directory for executables." FORCE)
 
-
 # Set a default build type if none was specified
 # See https://blog.kitware.com/cmake-and-the-default-build-type/ for details.
 set(default_build_type "RelWithDebInfo")
