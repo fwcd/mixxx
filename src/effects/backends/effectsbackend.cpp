@@ -1,7 +1,7 @@
 #include "effects/backends/effectsbackend.h"
 
 namespace {
-const QString backendTypeNameAU = QStringLiteral("Audio Unit");
+const QString backendTypeNameAU = QStringLiteral("AudioUnit");
 const QString backendTypeNameLV2 = QStringLiteral("LV2");
 // QString::tr requires const char[] rather than QString
 //: Backend type for effects that are built into Mixxx.
