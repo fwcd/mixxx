@@ -86,7 +86,8 @@ void AudioUnitEffectGroupState::render(AURenderBlock _Nonnull renderBlock,
             &m_outputBuffers,
             pullInputBlock);
     if (renderStatus != noErr) {
-        qWarning() << "Rendering Audio Unit failed with status" << renderStatus;
+        qWarning() << "Rendering Audio Unit failed with status" << renderStatus
+                   << "(Check https://www.osstatus.com for a description)";
         return;
     }
 
