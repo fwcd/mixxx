@@ -38,12 +38,20 @@ AudioUnitManifest::AudioUnitManifest(
 
             // TODO: Check CanRamp too?
             if (paramFlags & kAudioUnitParameterFlag_IsWritable) {
+                auto minValue = [parameter minValue];
+                auto maxValue = [parameter maxValue];
+                auto defaultValue = [parameter value];
+
+                // Strangely enough this value can be out of bounds, so we'll
+                // just default to the minimum in that case
+                if (defaultValue < minValue || defaultValue > maxValue) {
+                    defaultValue = minValue;
+                }
+
                 EffectManifestParameterPointer manifestParam = addParameter();
                 manifestParam->setId(paramId);
                 manifestParam->setName(paramName);
-                manifestParam->setRange([parameter minValue],
-                        [parameter value],
-                        [parameter maxValue]);
+                manifestParam->setRange(minValue, defaultValue, maxValue);
 
                 // Link the first parameter
                 // TODO: Figure out if AU plugins provide a better way to figure
