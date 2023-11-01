@@ -5,7 +5,6 @@
 
 #include "effects/backends/audiounit/audiounitmanager.h"
 #include "effects/backends/audiounit/audiounitmanifest.h"
-#include "effects/backends/audiounit/audiounitutils.h"
 #include "effects/defs.h"
 
 AudioUnitManifest::AudioUnitManifest(
@@ -21,40 +20,18 @@ AudioUnitManifest::AudioUnitManifest(
     // Try instantiating the unit in-process to fetch its properties quickly
 
     AudioUnitManager manager{component, AudioUnitInstantiationType::Sync};
-    AudioUnit audioUnit = manager.getAudioUnit();
+    AUAudioUnit* audioUnit = manager.getAudioUnit();
 
     if (audioUnit) {
-        // Fetch number of parameters
-        UInt32 paramListBytes = 0;
-        AUDIO_UNIT_INFO(audioUnit, ParameterList, Global, 0, &paramListBytes);
-
-        // Fetch parameter ids
-        UInt32 paramCount = paramListBytes / sizeof(AudioUnitParameterID);
-        std::unique_ptr<AudioUnitParameterID[]> paramIds{
-                new AudioUnitParameterID[paramCount]};
-        AUDIO_UNIT_GET(audioUnit,
-                ParameterList,
-                Global,
-                0,
-                paramIds.get(),
-                &paramListBytes);
+        AUParameterTree* parameterTree = [audioUnit parameterTree];
+        NSArray<AUParameter*>* parameters = [parameterTree allParameters];
 
         // Resolve parameters
-        AudioUnitParameterInfo paramInfo;
-        UInt32 paramInfoSize = sizeof(AudioUnitParameterInfo);
         bool hasLinkedParam = false;
-        for (UInt32 i = 0; i < paramCount; i++) {
-            AudioUnitParameterID paramId = paramIds[i];
-
-            AUDIO_UNIT_GET(audioUnit,
-                    ParameterInfo,
-                    Global,
-                    paramId,
-                    &paramInfo,
-                    &paramInfoSize);
-
-            QString paramName = QString::fromUtf8(paramInfo.name);
-            auto paramFlags = paramInfo.flags;
+        for (AUParameter* parameter in parameters) {
+            QString paramName = QString::fromNSString([parameter displayName]);
+            auto paramId = QString::fromNSString([parameter identifier]);
+            auto paramFlags = [parameter flags];
 
             qDebug() << QString::fromNSString([component name])
                      << "has parameter" << paramName;
@@ -62,11 +39,11 @@ AudioUnitManifest::AudioUnitManifest(
             // TODO: Check CanRamp too?
             if (paramFlags & kAudioUnitParameterFlag_IsWritable) {
                 EffectManifestParameterPointer manifestParam = addParameter();
-                manifestParam->setId(QString::number(paramId));
+                manifestParam->setId(paramId);
                 manifestParam->setName(paramName);
-                manifestParam->setRange(paramInfo.minValue,
-                        paramInfo.defaultValue,
-                        paramInfo.maxValue);
+                manifestParam->setRange([parameter minValue],
+                        [parameter value],
+                        [parameter maxValue]);
 
                 // Link the first parameter
                 // TODO: Figure out if AU plugins provide a better way to figure

@@ -25,15 +25,20 @@ class AudioUnitManager {
 
     /// Fetches the audio unit if already instantiated.
     /// Non-blocking and thread-safe.
-    AudioUnit _Nullable getAudioUnit();
+    AUAudioUnit* _Nullable getAudioUnit();
+
+    /// Fetches the render block if already instantiated.
+    /// Non-blocking and thread-safe.
+    AURenderBlock _Nullable getRenderBlock();
 
   private:
     QString m_name;
     std::atomic<bool> m_isInstantiated;
-    AudioUnit _Nullable m_audioUnit;
+    AUAudioUnit* _Nullable m_audioUnit;
+    AURenderBlock _Nullable m_renderBlock;
 
     void instantiateAudioUnitAsync(AVAudioUnitComponent* _Nonnull component, bool inProcess);
     void instantiateAudioUnitSync(AVAudioUnitComponent* _Nonnull component);
 
-    void initializeWith(AudioUnit _Nonnull audioUnit);
+    void initializeWith(AUAudioUnit* _Nonnull audioUnit);
 };

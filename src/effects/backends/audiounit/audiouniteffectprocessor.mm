@@ -53,7 +53,7 @@ OSStatus AudioUnitEffectGroupState::renderCallback(AudioUnitRenderActionFlags*,
     return noErr;
 }
 
-void AudioUnitEffectGroupState::render(AudioUnit _Nonnull audioUnit,
+void AudioUnitEffectGroupState::render(AURenderBlock _Nonnull renderBlock,
         SINT sampleCount,
         const CSAMPLE* _Nonnull pInput,
         CSAMPLE* _Nonnull pOutput) {
@@ -66,31 +66,25 @@ void AudioUnitEffectGroupState::render(AudioUnit _Nonnull audioUnit,
     m_outputBuffers.mBuffers[0].mDataByteSize = size;
 
     // Set the render callback
-    AURenderCallbackStruct callback;
-    callback.inputProc = AudioUnitEffectGroupState::renderCallbackUntyped;
-    callback.inputProcRefCon = this;
-
-    OSStatus setCallbackStatus = AudioUnitSetProperty(audioUnit,
-            kAudioUnitProperty_SetRenderCallback,
-            kAudioUnitScope_Input,
-            0,
-            &callback,
-            sizeof(AURenderCallbackStruct));
-    if (setCallbackStatus != noErr) {
-        qWarning() << "Setting Audio Unit render callback failed with status"
-                   << setCallbackStatus;
-        return;
-    }
+    AURenderPullInputBlock pullInputBlock =
+            ^(AudioUnitRenderActionFlags* _Nonnull flags,
+                    const AudioTimeStamp* _Nonnull timestamp,
+                    AUAudioFrameCount frameCount,
+                    NSInteger inputBusNumber,
+                    AudioBufferList* _Nonnull inputData) {
+              return renderCallback(
+                      flags, timestamp, inputBusNumber, frameCount, inputData);
+            };
 
     // Apply the actual effect to the sample.
     AudioUnitRenderActionFlags flags = 0;
     NSInteger outputBusNumber = 0;
-    OSStatus renderStatus = AudioUnitRender(audioUnit,
-            &flags,
+    OSStatus renderStatus = renderBlock(&flags,
             &m_timestamp,
-            outputBusNumber,
             sampleCount,
-            &m_outputBuffers);
+            outputBusNumber,
+            &m_outputBuffers,
+            pullInputBlock);
     if (renderStatus != noErr) {
         qWarning() << "Rendering Audio Unit failed with status" << renderStatus;
         return;
@@ -117,8 +111,8 @@ void AudioUnitEffectProcessor::processChannel(
         const mixxx::EngineParameters& engineParameters,
         const EffectEnableState,
         const GroupFeatureState&) {
-    AudioUnit _Nullable audioUnit = m_manager.getAudioUnit();
-    if (!audioUnit) {
+    AURenderBlock _Nullable renderBlock = m_manager.getRenderBlock();
+    if (!renderBlock) {
         qWarning()
                 << "Cannot process channel before Audio Unit is instantiated";
         return;
@@ -132,12 +126,14 @@ void AudioUnitEffectProcessor::processChannel(
 
     // Render the effect into the output buffer
     channelState->render(
-            audioUnit, engineParameters.samplesPerBuffer(), pInput, pOutput);
+            renderBlock, engineParameters.samplesPerBuffer(), pInput, pOutput);
 }
 
 void AudioUnitEffectProcessor::syncParameters() {
-    AudioUnit _Nullable audioUnit = m_manager.getAudioUnit();
+    AUAudioUnit* _Nullable audioUnit = m_manager.getAudioUnit();
     DEBUG_ASSERT(audioUnit != nil);
+
+    AUParameterTree* parameterTree = [audioUnit parameterTree];
 
     m_lastValues.reserve(m_parameters.size());
 
@@ -155,13 +151,14 @@ void AudioUnitEffectProcessor::syncParameters() {
         if (m_lastValues[i] != value) {
             m_lastValues[i] = value;
 
-            OSStatus status = AudioUnitSetParameter(
-                    audioUnit, id, kAudioUnitScope_Global, 0, value, 0);
-            if (status != noErr) {
-                qWarning()
-                        << "Could not set Audio Unit parameter" << id << ":"
-                        << status
-                        << "(Check https://www.osstatus.com for a description)";
+            AUParameter* auParameter =
+                    [parameterTree parameterWithID:id
+                                             scope:kAudioUnitScope_Global
+                                           element:0];
+            if (auParameter != nil) {
+                [auParameter setValue:value];
+            } else {
+                qWarning() << "Could not set parameter with id" << id;
             }
         }
 
@@ -171,7 +168,7 @@ void AudioUnitEffectProcessor::syncParameters() {
 
 void AudioUnitEffectProcessor::syncStreamFormat(
         const mixxx::EngineParameters& parameters) {
-    AudioUnit _Nullable audioUnit = m_manager.getAudioUnit();
+    AUAudioUnit* _Nullable audioUnit = m_manager.getAudioUnit();
     DEBUG_ASSERT(audioUnit != nil);
 
     if (parameters.sampleRate() != m_lastSampleRate ||
@@ -188,26 +185,23 @@ void AudioUnitEffectProcessor::syncStreamFormat(
                             channels:channelCount
                          interleaved:false];
 
-        const auto* streamFormat = [audioFormat streamDescription];
-
         qDebug() << "Updating Audio Unit stream format to sample rate"
                  << sampleRate << "and channel count" << channelCount;
 
-        for (auto scope : {kAudioUnitScope_Input, kAudioUnitScope_Output}) {
-            OSStatus status = AudioUnitSetProperty(audioUnit,
-                    kAudioUnitProperty_StreamFormat,
-                    scope,
-                    0,
-                    streamFormat,
-                    sizeof(AudioStreamBasicDescription));
+        for (AUAudioUnitBusArray* buses in
+                @[ [audioUnit inputBusses], [audioUnit outputBusses] ]) {
+            for (AUAudioUnitBus* bus in buses) {
+                NSError* error = nil;
+                [bus setFormat:audioFormat error:&error];
 
-            if (status != noErr) {
-                qWarning()
-                        << "Could not set Audio Unit stream format to sample "
-                           "rate"
-                        << sampleRate << "and channel count" << channelCount
-                        << ":" << status
-                        << "(Check https://www.osstatus.com for a description)";
+                if (error != nil) {
+                    qWarning()
+                            << "Could not set Audio Unit stream format to "
+                               "sample "
+                               "rate"
+                            << sampleRate << "and channel count" << channelCount
+                            << ":" << [error localizedDescription];
+                }
             }
         }
     }
