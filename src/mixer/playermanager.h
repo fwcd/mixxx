@@ -4,6 +4,7 @@
 
 #include <QList>
 #include <QMap>
+#include <QUrl>
 #include <QObject>
 
 #include "analyzer/trackanalysisscheduler.h"
@@ -188,6 +189,7 @@ class PlayerManager : public QObject, public PlayerManagerInterface {
     void slotLoadTrackToPlayer(TrackPointer pTrack, const QString& group, bool play);
     void slotLoadLocationToPlayer(const QString& location, const QString& group, bool play);
     void slotLoadLocationToPlayerMaybePlay(const QString& location, const QString& group);
+    void slotLoadUrlToPlayer(const QUrl& url, const QString& group, bool play);
 
     void slotCloneDeck(const QString& source_group, const QString& target_group);
 
@@ -196,6 +198,7 @@ class PlayerManager : public QObject, public PlayerManagerInterface {
     void slotLoadLocationIntoNextAvailableDeck(const QString& location, bool play = false);
     // Loads the location to the deck. deckNumber is 1-indexed
     void slotLoadToDeck(const QString& location, int deckNumber);
+    void slotLoadUrlToDeck(const QUrl& url, int deckNumber);
 
     // Loads the location to the preview deck. previewDeckNumber is 1-indexed
     void slotLoadToPreviewDeck(const QString& location, int previewDeckNumber);
@@ -222,6 +225,7 @@ class PlayerManager : public QObject, public PlayerManagerInterface {
 
   signals:
     void loadLocationToPlayer(const QString& location, const QString& group, bool play);
+    void loadUrlToPlayer(const QUrl& url, const QString& group, bool play);
 
     // Emitted when the user tries to enable a microphone talkover control when
     // there is no input configured.

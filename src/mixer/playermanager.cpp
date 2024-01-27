@@ -180,6 +180,10 @@ void PlayerManager::bindToLibrary(Library* pLibrary) {
             &PlayerManager::loadLocationToPlayer,
             pLibrary,
             &Library::slotLoadLocationToPlayer);
+    connect(this,
+            &PlayerManager::loadUrlToPlayer,
+            pLibrary,
+            &Library::slotLoadUrlToPlayer);
 
     DEBUG_ASSERT(!m_pTrackAnalysisScheduler);
     m_pTrackAnalysisScheduler = pLibrary->createTrackAnalysisScheduler(
@@ -714,6 +718,13 @@ void PlayerManager::slotLoadLocationToPlayer(
     emit loadLocationToPlayer(location, group, play);
 }
 
+void PlayerManager::slotLoadUrlToPlayer(
+        const QUrl& url, const QString& group, bool play) {
+    // The library will get the track and then signal back to us to load the
+    // track via slotLoadTrackToPlayer.
+    emit loadUrlToPlayer(url, group, play);
+}
+
 void PlayerManager::slotLoadLocationToPlayerMaybePlay(
         const QString& location, const QString& group) {
     bool play = false;
@@ -735,6 +746,10 @@ void PlayerManager::slotLoadLocationToPlayerMaybePlay(
 
 void PlayerManager::slotLoadToDeck(const QString& location, int deck) {
     slotLoadLocationToPlayer(location, groupForDeck(deck - 1), false);
+}
+
+void PlayerManager::slotLoadUrlToDeck(const QUrl& url, int deck) {
+    slotLoadUrlToPlayer(url, groupForDeck(deck - 1), false);
 }
 
 void PlayerManager::slotLoadToPreviewDeck(const QString& location, int previewDeck) {

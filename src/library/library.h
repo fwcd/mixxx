@@ -2,6 +2,7 @@
 
 #include <QFont>
 #include <QList>
+#include <QUrl>
 #include <QObject>
 #include <QPointer>
 
@@ -12,6 +13,7 @@
 #endif
 #include "preferences/usersettings.h"
 #include "track/track_decl.h"
+#include "track/trackref.h"
 #include "util/db/dbconnectionpool.h"
 #include "util/parented_ptr.h"
 
@@ -107,7 +109,9 @@ class Library: public QObject {
     void slotSwitchToView(const QString& view);
     void slotLoadTrack(TrackPointer pTrack);
     void slotLoadTrackToPlayer(TrackPointer pTrack, const QString& group, bool play);
+    void slotLoadTrackRefToPlayer(TrackRef trackRef, const QString& group, bool play);
     void slotLoadLocationToPlayer(const QString& location, const QString& group, bool play);
+    void slotLoadUrlToPlayer(const QUrl& url, const QString& group, bool play);
     void slotRefreshLibraryModels();
     void slotCreatePlaylist();
     void slotCreateCrate();

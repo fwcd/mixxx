@@ -536,12 +536,19 @@ void Library::slotLoadTrack(TrackPointer pTrack) {
     emit loadTrack(pTrack);
 }
 
-void Library::slotLoadLocationToPlayer(const QString& location, const QString& group, bool play) {
-    auto trackRef = TrackRef::fromFilePath(location);
+void Library::slotLoadTrackRefToPlayer(TrackRef trackRef, const QString& group, bool play) {
     TrackPointer pTrack = m_pTrackCollectionManager->getOrAddTrack(trackRef);
     if (pTrack) {
         emit loadTrackToPlayer(pTrack, group, play);
     }
+}
+
+void Library::slotLoadLocationToPlayer(const QString& location, const QString& group, bool play) {
+    slotLoadTrackRefToPlayer(TrackRef::fromFilePath(location), group, play);
+}
+
+void Library::slotLoadUrlToPlayer(const QUrl& url, const QString& group, bool play) {
+    slotLoadTrackRefToPlayer(TrackRef::fromUrl(url), group, play);
 }
 
 void Library::slotLoadTrackToPlayer(
