@@ -356,6 +356,7 @@ void MixxxMainWindow::initialize() {
     // that says "mixxx will barely work with no outs".
     // In case of persisting errors, the user has already received a message
     // above. So we can just check the output count here.
+#ifndef Q_OS_IOS
     while (m_pCoreServices->getSoundManager()->getConfig().getOutputs().count() == 0) {
         // Exit when we press the Exit button in the noSoundDlg dialog
         // only call it if result != OK
@@ -367,6 +368,7 @@ void MixxxMainWindow::initialize() {
             break;
         }
     }
+#endif
 
     // The user has either reconfigured devices or accepted no outputs,
     // so it's now safe to write the new config to disk.
