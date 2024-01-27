@@ -125,7 +125,11 @@ SkinPointer SkinLoader::getConfiguredSkin() const {
 }
 
 QString SkinLoader::getDefaultSkinName() const {
+#ifdef Q_OS_IOS
+    return "LateNightMini";
+#else
     return "LateNight";
+#endif
 }
 
 QWidget* SkinLoader::loadConfiguredSkin(QWidget* pParent,
