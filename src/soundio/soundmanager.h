@@ -23,7 +23,14 @@ class ControlObject;
 #define MIXXX_PORTAUDIO_OSS_STRING "OSS"
 #define MIXXX_PORTAUDIO_ASIO_STRING "ASIO"
 #define MIXXX_PORTAUDIO_DIRECTSOUND_STRING "Windows DirectSound"
+
+#ifdef Q_OS_IOS
+// NOTE: This is what our patched version of PortAudio uses. If/when upstream
+// supports iOS officially, we may have to update this.
+#define MIXXX_PORTAUDIO_COREAUDIO_STRING "iOS Audio"
+#else
 #define MIXXX_PORTAUDIO_COREAUDIO_STRING "Core Audio"
+#endif
 
 #define SOUNDMANAGER_DISCONNECTED 0
 #define SOUNDMANAGER_CONNECTING 1
