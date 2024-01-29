@@ -6,6 +6,50 @@
     <SizePolicy>e,e</SizePolicy>
     <Children>
 
+      <!-- Play/CUE -->
+      <WidgetGroup>
+        <Layout>vertical</Layout>
+        <Children>
+          <!-- Play button -->
+          <PushButton>
+            <NumberStates>2</NumberStates>
+            <Size>40,20</Size>
+            <State>
+              <Number>0</Number>
+              <Unpressed scalemode="STRETCH">skin:/buttons/btn_play.svg</Unpressed>
+              <Pressed scalemode="STRETCH">skin:/buttons/btn_play_down.svg</Pressed>
+            </State>
+            <State>
+              <Number>1</Number>
+              <Unpressed scalemode="STRETCH">skin:/buttons/btn_play_over.svg</Unpressed>
+              <Pressed scalemode="STRETCH">skin:/buttons/btn_play_overdown.svg</Pressed>
+            </State>
+            <Connection>
+              <ConfigKey><Variable name="group"/>,play</ConfigKey>
+            </Connection>
+          </PushButton><!-- Play button -->
+
+          <!-- CUE button -->
+          <PushButton>
+            <NumberStates>2</NumberStates>
+            <Size>40,20</Size>
+            <State>
+              <Number>0</Number>
+              <Unpressed scalemode="STRETCH">skin:/buttons/btn_cue.svg</Unpressed>
+              <Pressed scalemode="STRETCH">skin:/buttons/btn_cue_down.svg</Pressed>
+            </State>
+            <State>
+              <Number>1</Number>
+              <Unpressed scalemode="STRETCH">skin:/buttons/btn_cue_over.svg</Unpressed>
+              <Pressed scalemode="STRETCH">skin:/buttons/btn_cue_overdown.svg</Pressed>
+            </State>
+            <Connection>
+              <ConfigKey><Variable name="group"/>,cue_default</ConfigKey>
+            </Connection>
+          </PushButton><!-- CUE button -->
+        </Children>
+      </WidgetGroup><!-- Play/CUE -->
+
       <WidgetGroup>
         <ObjectName>RateContainer</ObjectName>
         <Layout>vertical</Layout>
