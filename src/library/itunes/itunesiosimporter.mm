@@ -122,7 +122,6 @@ class ImporterImpl {
 
     void importMediaItem(MPMediaItem* item) {
         // Skip DRM-protected and non-downloaded tracks
-        // TODO: Is this correct? Is `isCloudItem` guaranteed to be false if downloaded?
         if (item.hasProtectedAsset || item.isCloudItem) {
             return;
         }
