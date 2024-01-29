@@ -120,21 +120,16 @@
         <WidgetStack currentpage="[Master],maximize_library">
           <Children>
 
-            <!-- Decks, Effects ... Library -->
-            <Splitter>
-              <ObjectName>HorizontalSplitter</ObjectName>
-              <Orientation>vertical</Orientation>
-              <SizePolicy>me,min</SizePolicy>
-              <SplitSizes>1,5</SplitSizes>
-              <SplitSizesConfigKey>[LateNight],waveform_splitSize</SplitSizesConfigKey>
-              <Collapsible>1,0</Collapsible>
+            <!-- Waveforms and decks -->
+            <WidgetGroup>
+              <ObjectName>WaveformsAndDecks</ObjectName>
+              <Layout>vertical</Layout>
               <Children>
 
                 <Template src="skin:waveforms.xml"/>
 
                 <WidgetGroup>
                   <Layout>vertical</Layout>
-                  <SizePolicy>me,me</SizePolicy>
                   <Children>
                     <WidgetGroup>
                       <Layout>horizontal</Layout>
@@ -151,7 +146,7 @@
                 </WidgetGroup>
 
               </Children>
-            </Splitter><!-- Decks, Effects ... Library -->
+            </WidgetGroup><!-- Waveforms and decks -->
 
             <!-- MAximized Library -->
             <WidgetGroup trigger="[Master],maximize_library" on_hide_select="0">
