@@ -7,9 +7,11 @@ namespace mixxx {
 
 void initializeAVAudioSession() {
     AVAudioSession* session = AVAudioSession.sharedInstance;
-    AVAudioSessionCategory category = AVAudioSessionCategoryPlayAndRecord;
-    AVAudioSessionMode mode = AVAudioSessionModeMeasurement;
-    AVAudioSessionCategoryOptions options = AVAudioSessionCategoryOptionMixWithOthers;
+    AVAudioSessionCategory category = AVAudioSessionCategoryPlayback;
+    AVAudioSessionMode mode = AVAudioSessionModeDefault;
+    AVAudioSessionCategoryOptions options = AVAudioSessionCategoryOptionMixWithOthers
+                                          | AVAudioSessionCategoryOptionAllowAirPlay
+                                          | AVAudioSessionCategoryOptionAllowBluetoothA2DP;
     
     NSError* error = nil;
     [session setCategory:category mode:mode options:options error:&error];
