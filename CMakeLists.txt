@@ -2665,7 +2665,6 @@ set(
     Gui
     Network
     OpenGL
-    PrintSupport
     Qml # for QJSEngine
     Sql
     Svg
@@ -2680,6 +2679,9 @@ if(QT6)
   list(APPEND QT_EXTRA_COMPONENTS "SvgWidgets")
   list(APPEND QT_EXTRA_COMPONENTS "Core5Compat")
 else()
+  if(NOT IOS)
+    list(APPEND QT_EXTRA_COMPONENTS "PrintSupport")
+  endif()
   find_package(QT 5.12 NAMES Qt5 COMPONENTS Core REQUIRED)
 endif()
 if(QML)
