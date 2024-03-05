@@ -496,7 +496,9 @@ void SoundManagerConfig::loadDefaults(SoundManager* soundManager, unsigned int f
                 m_api = MIXXX_PORTAUDIO_DIRECTSOUND_STRING;
             }
 #endif
-#ifdef Q_OS_IOS
+#if defined(Q_OS_WASM)
+            m_api = MIXXX_PORTAUDIO_WEBAUDIO_STRING;
+#elif defined(Q_OS_IOS)
             m_api = MIXXX_PORTAUDIO_IOSAUDIO_STRING;
 #elif defined(Q_OS_MACOS)
             m_api = MIXXX_PORTAUDIO_COREAUDIO_STRING;

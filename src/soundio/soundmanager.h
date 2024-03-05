@@ -28,6 +28,7 @@ class ControlObject;
 // (https://github.com/PortAudio/portaudio/pull/881), we may have to update this
 #define MIXXX_PORTAUDIO_IOSAUDIO_STRING "iOS Audio"
 #define MIXXX_PORTAUDIO_COREAUDIO_STRING "Core Audio"
+#define MIXXX_PORTAUDIO_WEBAUDIO_STRING "Web Audio"
 
 #define SOUNDMANAGER_DISCONNECTED 0
 #define SOUNDMANAGER_CONNECTING 1
