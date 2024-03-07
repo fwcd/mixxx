@@ -131,7 +131,7 @@ WaveformWidgetFactory::WaveformWidgetFactory()
                     reinterpret_cast<const char*>(glFunctions->glGetString(GL_VENDOR))));
             QString rendererString = QString(QLatin1String(
                     reinterpret_cast<const char*>(glFunctions->glGetString(GL_RENDERER))));
-            qDebug().noquote() << QStringLiteral(
+            qWarning().noquote() << QStringLiteral(
                     "OpenGL driver version string \"%1\", vendor \"%2\", "
                     "renderer \"%3\"")
                                           .arg(versionString, vendorString, rendererString);
@@ -149,7 +149,7 @@ WaveformWidgetFactory::WaveformWidgetFactory()
                 minorVersion = match.captured(2).toInt();
             }
 
-            qDebug().noquote()
+            qWarning().noquote()
                     << QStringLiteral("Supported OpenGL version: %1.%2")
                                .arg(QString::number(majorVersion), QString::number(minorVersion));
 
