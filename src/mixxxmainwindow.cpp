@@ -601,6 +601,9 @@ void MixxxMainWindow::alwaysHideMenuBarDlg() {
 
 QDialog::DialogCode MixxxMainWindow::soundDeviceErrorDlg(
         const QString &title, const QString &text, bool* retryClicked) {
+#ifdef __EMSCRIPTEN__
+    return QDialog::Accepted;
+#else
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Warning);
     msgBox.setWindowTitle(title);
@@ -644,6 +647,7 @@ QDialog::DialogCode MixxxMainWindow::soundDeviceErrorDlg(
             return QDialog::Rejected;
         }
     }
+#endif
 }
 
 QDialog::DialogCode MixxxMainWindow::soundDeviceBusyDlg(bool* retryClicked) {
