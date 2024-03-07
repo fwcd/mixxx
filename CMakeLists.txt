@@ -1599,6 +1599,9 @@ if(EMSCRIPTEN)
   # when targeting Emscripten/WebAssembly.
   # See https://doc.qt.io/qt-6/wasm.html#asyncify
   target_link_options(mixxx-lib PUBLIC -sASYNCIFY)
+  # Enable as many threads as the user has cores as per this recommendation:
+  # https://github.com/emscripten-core/emscripten/issues/14407#issuecomment-861038985
+  target_link_options(mixxx-lib PUBLIC -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency)
 endif()
 
 # QML Debugging
