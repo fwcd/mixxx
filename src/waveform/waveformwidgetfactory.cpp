@@ -1274,6 +1274,12 @@ QSurfaceFormat WaveformWidgetFactory::getSurfaceFormat(UserSettingsPointer confi
     // Compatibility profile
     // format.setProfile(QSurfaceFormat::CoreProfile);
 
+#ifdef __EMSCRIPTEN__
+    // We need to explicitly request OpenGL ES 3.0 when targeting
+    // Emscripten/WebAssembly.
+    format.setMajorVersion(3);
+#endif
+
     // setSwapInterval sets the application preferred swap interval
     // in minimum number of video frames that are displayed before a buffer swap occurs
     // - 0 will turn the vertical refresh syncing off
