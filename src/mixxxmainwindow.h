@@ -125,7 +125,7 @@ class MixxxMainWindow : public QMainWindow {
 
     QWidget* m_pCentralWidget;
     LaunchImage* m_pLaunchImage;
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__EMSCRIPTEN__)
     Qt::WindowStates m_prevState;
 #endif
 

@@ -90,7 +90,7 @@ MixxxMainWindow::MixxxMainWindow(std::shared_ptr<mixxx::CoreServices> pCoreServi
         : m_pCoreServices(pCoreServices),
           m_pCentralWidget(nullptr),
           m_pLaunchImage(nullptr),
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__EMSCRIPTEN__)
           m_prevState(Qt::WindowNoState),
 #endif
           m_pGuiTick(nullptr),
@@ -449,7 +449,7 @@ MixxxMainWindow::~MixxxMainWindow() {
         // Simply maximize the window so we can store a geometry that fits the screen.
         // Don't call slotViewFullScreen(false) (calls showNormal()) because that
         // can make the main window incl. window decoration too large for the screen.
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__EMSCRIPTEN__)
         // Before, store the expected window state so eventFilter() will ignore
         // the following QWindowChangeEvent and not recreate & re-sync the menu bar.
         m_prevState = Qt::WindowMaximized;
@@ -1279,7 +1279,7 @@ bool MixxxMainWindow::eventFilter(QObject* obj, QEvent* event) {
             }
         }
     } else if (event->type() == QEvent::WindowStateChange) {
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__EMSCRIPTEN__)
         qWarning() << "$ WindowStateChange:" << windowState();
         if (windowState() == m_prevState) {
             // Ignore no-op. This happens if another window is raised above
