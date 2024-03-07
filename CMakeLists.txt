@@ -1595,6 +1595,8 @@ if(APPLE)
 endif()
 
 if(EMSCRIPTEN)
+  # We need more memory, otherwise wasm-ld will complain about too little memory.
+  target_link_options(mixxx-lib PUBLIC -sTOTAL_MEMORY=64MB)
   # We need asyncify to support asynchronous calls (e.g. QDialog::exec)
   # when targeting Emscripten/WebAssembly.
   # See https://doc.qt.io/qt-6/wasm.html#asyncify
