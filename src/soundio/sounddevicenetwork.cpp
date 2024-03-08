@@ -485,7 +485,11 @@ void SoundDeviceNetwork::callbackProcessClkRef() {
         // verify if flush to zero or denormals to zero works
         // test passes if one of the two flag is set.
         volatile double doubleMin = DBL_MIN; // the smallest normalized double
+#ifdef __EMSCRIPTEN__
+        if (doubleMin / 2 != 0.0) {
+#else
         VERIFY_OR_DEBUG_ASSERT(doubleMin / 2 == 0.0) {
+#endif
             qWarning() << "Network Sound: Denormals to zero mode is not working. "
                           "EQs and effects may suffer high CPU load";
         }
