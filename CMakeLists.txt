@@ -1821,6 +1821,9 @@ if(EMSCRIPTEN)
   # See https://emscripten.org/docs/porting/files/packaging_files.html
   # TODO: Strip this down by only including what we need (i.e. no macOS/Linux packaging, ...)
   target_link_options(mixxx-lib PUBLIC "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/res@/res")
+  # NOTE: We're using royalty-free music for testing, remove before releasing
+  # See demotracks/README.md or About window for license info/credits
+  target_link_options(mixxx-lib PUBLIC "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/demotracks@/home/web_user/Music")
 endif()
 
 if(WIN32)

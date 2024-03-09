@@ -34,6 +34,7 @@ DlgAbout::DlgAbout()
         licenseText->setPlainText(licenseFile.readAll());
     }
 
+    QString s_demoTracks = "Demo Tracks";
     QString s_devTeam =
             tr("Mixxx %1.%2 Development Team")
                     .arg(QString::number(
@@ -44,6 +45,12 @@ DlgAbout::DlgAbout()
     QString s_specialThanks = tr("And special thanks to:");
     QString s_pastDevs = tr("Past Developers");
     QString s_pastContribs = tr("Past Contributors");
+
+    QStringList demoTrackCredits;
+    demoTrackCredits
+            << "\"Boogie Party\" Kevin MacLeod (incompetech.com)"
+            << "Licensed under Creative Commons: By Attribution 4.0 License"
+            << "http://creativecommons.org/licenses/by/4.0/";
 
     QStringList thisReleaseDevelopers;
     thisReleaseDevelopers
@@ -394,7 +401,9 @@ DlgAbout::DlgAbout()
     QString sectionTemplate = QString(
         "<p align=\"center\"><b>%1</b></p><p align=\"center\">%2</p>");
     QStringList sections;
-    sections << sectionTemplate.arg(s_devTeam,
+    sections << sectionTemplate.arg(s_demoTracks,
+                                    demoTrackCredits.join("<br>"))
+             << sectionTemplate.arg(s_devTeam,
                                     thisReleaseDevelopers.join("<br>"))
              << sectionTemplate.arg(s_contributions,
                                     recentContributors.join("<br>"))
