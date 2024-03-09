@@ -234,7 +234,7 @@ void DlgPrefLibrary::slotResetToDefaults() {
 void DlgPrefLibrary::slotUpdate() {
     initializeDirList();
     checkBox_library_scan->setChecked(m_pConfig->getValue(
-            kRescanOnStartupConfigKey, false));
+            kRescanOnStartupConfigKey, true));
 
     spinbox_history_track_duplicate_distance->setValue(m_pConfig->getValue(
             kHistoryTrackDuplicateDistanceConfigKey,
