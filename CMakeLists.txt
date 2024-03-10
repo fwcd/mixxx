@@ -1601,6 +1601,8 @@ if(EMSCRIPTEN)
   # when targeting Emscripten/WebAssembly.
   # See https://doc.qt.io/qt-6/wasm.html#asyncify
   target_link_options(mixxx-lib PUBLIC -sASYNCIFY)
+  # Enable Wasm Audio Worklets, which are required for PortAudio's Web Audio integration
+  target_link_options(mixxx-lib PUBLIC -sAUDIO_WORKLET -sWASM_WORKERS)
   # Enable as many threads as the user has cores as per this recommendation:
   # https://github.com/emscripten-core/emscripten/issues/14407#issuecomment-861038985
   target_link_options(mixxx-lib PUBLIC -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency)
