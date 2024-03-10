@@ -335,6 +335,18 @@ void MixxxMainWindow::initialize() {
         checkDirectRendering();
     }
 
+#ifdef __EMSCRIPTEN__
+    // Prompt user to interact with site, otherwise PortAudio will not be able
+    // to open a Web Audio context.
+    {
+        QMessageBox interactMsgBox;
+        interactMsgBox.setIcon(QMessageBox::Information);
+        interactMsgBox.setWindowTitle("Web Audio");
+        interactMsgBox.setText("Due to browser policies, you need to interact with the site at least once so we can open an audio context. Click OK to do so.");
+        interactMsgBox.exec();
+    }
+#endif
+
     // Sound hardware setup
     // Try to open configured devices. If that fails, display dialogs
     // that allow to either retry, reconfigure devices or exit.
