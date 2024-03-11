@@ -497,7 +497,8 @@ void SoundManagerConfig::loadDefaults(SoundManager* soundManager, unsigned int f
             }
 #endif
 #if defined(Q_OS_WASM)
-            m_api = MIXXX_PORTAUDIO_WEBAUDIO_STRING;
+            // TODO: Enable this once the Web Audio API actually works
+            // m_api = MIXXX_PORTAUDIO_WEBAUDIO_STRING;
 #elif defined(Q_OS_IOS)
             m_api = MIXXX_PORTAUDIO_IOSAUDIO_STRING;
 #elif defined(Q_OS_MACOS)
