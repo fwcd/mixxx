@@ -175,6 +175,11 @@ class ImporterImpl {
             return;
         }
 
+        // Skip non-music audio content (e.g. audiobooks, podcasts)
+        if (item.mediaKind != ITLibMediaItemMediaKindSong) {
+            return;
+        }
+
         ITunesTrack track = {
                 .id = dbIdFromPersistentId(item.persistentID),
                 .artist = qStringFrom(item.artist.name),
