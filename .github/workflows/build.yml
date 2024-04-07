@@ -154,6 +154,10 @@ jobs:
       artifact-macos-macosarm: ${{ steps.prepare_deploy.outputs.artifact-macos-macosarm }}
       artifact-windows-win64: ${{ steps.prepare_deploy.outputs.artifact-windows-win64 }}
     steps:
+      - name: "[Fedora] Install Git"
+        if: matrix.container != null && startsWith(matrix.container, 'fedora')
+        run: dnf install -y git
+
       - name: "Check out repository"
         uses: actions/checkout@v4.1.1
         with:
