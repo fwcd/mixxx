@@ -248,17 +248,17 @@ jobs:
           BUILDENV_BASEPATH: ${{ matrix.buildenv_basepath }}
           BUILDENV_RELEASE: TRUE
 
-      - name: "[Ubuntu/macOS] Set up GitHub cache for ccache"
+      - name: "[Linux/macOS] Set up GitHub cache for ccache"
         if: runner.os != 'windows'
         uses: actions/cache@v4
         with:
           path: ${{ matrix.compiler_cache_path }}
-          key: ${{ matrix.os }}-${{ matrix.compiler_cache_id }}-${{ github.head_ref }}-${{ github.run_number }}
+          key: ${{ matrix.os }}-${{ matrix.container }}-${{ matrix.compiler_cache_id }}-${{ github.head_ref }}-${{ github.run_number }}
           restore-keys: |
-            ${{ matrix.os }}-${{ matrix.compiler_cache_id }}-${{ github.head_ref }}
-            ${{ matrix.os }}-${{ matrix.compiler_cache_id }}
+            ${{ matrix.os }}-${{ matrix.container }}-${{ matrix.compiler_cache_id }}-${{ github.head_ref }}
+            ${{ matrix.os }}-${{ matrix.container }}-${{ matrix.compiler_cache_id }}
 
-      - name: "[Ubuntu/macOS] Set up ccache"
+      - name: "[Linux/macOS] Set up ccache"
         # GitHub Actions gives us 10 GB of cache.
         # 4 runs * 2 GB = 8 GB
         run: |
@@ -293,7 +293,7 @@ jobs:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
 
-      - name: "[Ubuntu/macOS] Set up gcc/clang problem matcher"
+      - name: "[Linux/macOS] Set up gcc/clang problem matcher"
         if: runner.os != 'Windows'
         uses: ammaraskar/gcc-problem-matcher@0.3.0
 
@@ -311,7 +311,7 @@ jobs:
           # GitHub Actions automatically zstd compresses caches
           CCACHE_NOCOMPRESS: true
 
-      - name: "[Ubuntu/macOS] Print compiler cache stats"
+      - name: "[Linux/macOS] Print compiler cache stats"
         if: runner.os != 'windows'
         run: |
           ${{ matrix.compiler_cache }} --show-stats
@@ -362,12 +362,12 @@ jobs:
         working-directory: build
 
       - name: "[Ubuntu] Import PPA GPG key"
-        if: startsWith(matrix.os, 'ubuntu') && env.RRYAN_AT_MIXXX_DOT_ORG_GPG_PRIVATE_KEY != null
+        if: startsWith(matrix.os, 'ubuntu') && matrix.container == null && env.RRYAN_AT_MIXXX_DOT_ORG_GPG_PRIVATE_KEY != null
         run: gpg --import <(echo "${{ secrets.RRYAN_AT_MIXXX_DOT_ORG_GPG_PRIVATE_KEY }}")
         env:
           RRYAN_AT_MIXXX_DOT_ORG_GPG_PRIVATE_KEY: ${{ secrets.RRYAN_AT_MIXXX_DOT_ORG_GPG_PRIVATE_KEY }}
 
-      - name: "Package for PPA"
+      - name: "[Ubuntu] Package for PPA"
         # No need to do the PPA build for both Ubuntu versions
         if: matrix.name == 'Ubuntu 22.04'
         run: |
