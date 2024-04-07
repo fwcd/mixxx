@@ -42,6 +42,7 @@ jobs:
             os: ubuntu-22.04
             container: fedora:40
             cmake_args: >-
+              -G Ninja
               -DQT6=ON
               -DQML=ON
               -DBULK=ON
