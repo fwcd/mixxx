@@ -38,6 +38,30 @@ jobs:
             artifacts_path: build/*.deb
             artifacts_slug: ubuntu-jammy
             qt_qpa_platform: offscreen
+          - name: Fedora 40
+            os: ubuntu-22.04
+            container: fedora:40
+            cmake_args: >-
+              -DQT6=ON
+              -DQML=ON
+              -DBULK=ON
+              -DFFMPEG=ON
+              -DLOCALECOMPARE=ON
+              -DMAD=ON
+              -DMODPLUG=ON
+              -DWAVPACK=ON
+              -DINSTALL_USER_UDEV_RULES=OFF
+            ctest_args: []
+            compiler_cache: ccache
+            compiler_cache_path: /home/runner/.cache/ccache
+            compiler_cache_id: qt6
+            cpack_generator: RPM
+            buildenv_basepath: /home/runner/buildenv
+            buildenv_script: tools/rpm_buildenv.sh
+            artifacts_name: Fedora 40 Qt6 RPM
+            artifacts_path: build/*.rpm
+            artifacts_slug: fedora-40
+            qt_qpa_platform: offscreen
           - name: macOS 11 x64
             os: macos-11
             cmake_args: >-
@@ -136,7 +160,7 @@ jobs:
           # This is necessary for making `git describe` work.
           fetch-depth: 0
 
-      - name: "[Arch Linux] Workaround for the 'unsafe repository' issue caused by CVE-2022-24765"
+      - name: "[Docker/Linux] Workaround for the 'unsafe repository' issue caused by CVE-2022-24765"
         if: matrix.container != null
         # See https://github.com/actions/checkout/issues/760 for details
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
