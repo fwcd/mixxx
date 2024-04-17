@@ -82,7 +82,7 @@ midi_for_light.init = function(id) { // called when the MIDI device is opened & 
     midi_for_light.vu_meter_timer = undefined;
     midi_for_light.volumebeat_on_delay_timer = undefined;
 
-    engine.connectControl("[Master]", "crossfader", "midi_for_light.crossfaderChange");
+    engine.makeConnection("[Master]", "crossfader", "midi_for_light.crossfaderChange");
 
     if (enable_vu_meter_global === true) midi_for_light.vu_meter_timer = engine.beginTimer(40, midi_for_light.vuMeter);
 
@@ -92,10 +92,10 @@ midi_for_light.init = function(id) { // called when the MIDI device is opened & 
 
     for (var i = 0; i <= 3; i++) {
         deck_beat_watchdog_timer[i] = engine.beginTimer(beat_watchdog_time, () => { midi_for_light.deckBeatWatchdog(i); });
-        engine.connectControl("[Channel" + (i + 1) + "]", "beat_active", "midi_for_light.deckBeatOutputToMidi");
-        engine.connectControl("[Channel" + (i + 1) + "]", "volume", "midi_for_light.deckVolumeChange");
-        engine.connectControl("[Channel" + (i + 1) + "]", "play", "midi_for_light.deckButtonPlay");
-        if (enable_mtc_timecode === true) engine.connectControl("[Channel" + (i + 1) + "]", "playposition", "midi_for_light.sendMidiMtcFullFrame");
+        engine.makeConnection(`[Channel${i + 1}]`, "beat_active", "midi_for_light.deckBeatOutputToMidi");
+        engine.makeConnection(`[Channel${i + 1}]`, "volume", "midi_for_light.deckVolumeChange");
+        engine.makeConnection(`[Channel${i + 1}]`, "play", "midi_for_light.deckButtonPlay");
+        if (enable_mtc_timecode === true) { engine.makeConnection(`[Channel${i + 1}]`, "playposition", "midi_for_light.sendMidiMtcFullFrame"); }
     }
 
     midi_for_light.crossfaderChange();
