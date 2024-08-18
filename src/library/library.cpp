@@ -710,7 +710,6 @@ void Library::requestRelocateIOSSandboxDirs() {
 
     // TODO: Do we need to handle external track collections?
 
-    bool needsRescan = false;
     QStringList rootDirs = m_pTrackCollectionManager->internalCollection()->getRootDirStrings();
 
     for (const QString& dir : rootDirs) {
@@ -729,13 +728,6 @@ void Library::requestRelocateIOSSandboxDirs() {
             qWarning() << "Could not relink music directory after iOS sandbox moved";
             continue;
         }
-
-        needsRescan = true;
-    }
-
-    if (needsRescan) {
-        qInfo() << "Rescanning library since iOS sandbox moved";
-        m_pTrackCollectionManager->startLibraryScan();
     }
 }
 #endif
