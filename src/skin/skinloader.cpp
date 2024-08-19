@@ -1,5 +1,6 @@
 #include "skin/skinloader.h"
 
+#include <algorithm>
 #include <QDir>
 #include <QString>
 #include <QtDebug>
@@ -126,10 +127,13 @@ SkinPointer SkinLoader::getConfiguredSkin() const {
 
 QString SkinLoader::getDefaultSkinName() const {
 #ifdef Q_OS_IOS
-    return "LateNight Mini";
-#else
-    return "LateNight";
+    QSize screenSize = QGuiApplication::primaryScreen()->size();
+    bool isTablet = std::max(screenSize.width(), screenSize.height()) > 1000;
+    if (!isTablet) {
+        return "LateNight Mini";
+    }
 #endif
+    return "LateNight";
 }
 
 QWidget* SkinLoader::loadConfiguredSkin(QWidget* pParent,
