@@ -115,3 +115,7 @@ void AudioUnitManager::initializeWith(AudioUnit _Nonnull audioUnit) {
     m_audioUnit = audioUnit;
     m_isInstantiated.store(true);
 }
+
+QString AudioUnitManager::getName() const {
+    return m_name;
+}

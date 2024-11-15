@@ -30,6 +30,9 @@ class AudioUnitManager {
     /// want to e.g. block on a mutex.
     AudioUnit _Nullable getAudioUnit();
 
+    /// Fetches the audio unit's name.
+    QString getName() const;
+
   private:
     QString m_name;
     std::atomic<bool> m_isInstantiated;
