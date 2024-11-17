@@ -23,86 +23,78 @@ AudioUnitManifest::AudioUnitManifest(
     // Instantiate audio unit (out-of-process) to load parameters
     AudioUnitManager manager{component};
 
-    const int TIMEOUT_MS = 5000;
+    const unsigned long TIMEOUT_MS = 5000;
 
-    QElapsedTimer timer;
-    timer.start();
+    AudioUnit audioUnit = manager.waitForAudioUnit(TIMEOUT_MS);
 
-    while (manager.getAudioUnit() == nil) {
-        if (timer.elapsed() > TIMEOUT_MS) {
-            qWarning() << name() << "took more than" << TIMEOUT_MS
-                       << "ms to initialize, skipping manifest initialization "
-                          "for this effect. This means this effect will not "
-                          "display any parameters and likely not be useful!";
-            return;
-        }
-        QThread::msleep(10);
+    if (audioUnit == nil) {
+        qWarning() << name() << "took more than" << TIMEOUT_MS
+                   << "ms to initialize, skipping manifest initialization "
+                      "for this effect. This means this effect will not "
+                      "display any parameters and likely not be useful!";
+        return;
     }
 
-    AudioUnit audioUnit = manager.getAudioUnit();
+    // Fetch number of parameters
+    UInt32 paramListBytes = 0;
+    AUDIO_UNIT_INFO(audioUnit, ParameterList, Global, 0, &paramListBytes);
 
-    if (audioUnit) {
-        // Fetch number of parameters
-        UInt32 paramListBytes = 0;
-        AUDIO_UNIT_INFO(audioUnit, ParameterList, Global, 0, &paramListBytes);
+    // Fetch parameter ids
+    UInt32 paramCount = paramListBytes / sizeof(AudioUnitParameterID);
+    std::unique_ptr<AudioUnitParameterID[]> paramIds{
+            new AudioUnitParameterID[paramCount]};
+    AUDIO_UNIT_GET(audioUnit,
+            ParameterList,
+            Global,
+            0,
+            paramIds.get(),
+            &paramListBytes);
 
-        // Fetch parameter ids
-        UInt32 paramCount = paramListBytes / sizeof(AudioUnitParameterID);
-        std::unique_ptr<AudioUnitParameterID[]> paramIds{
-                new AudioUnitParameterID[paramCount]};
+    // Resolve parameters
+    AudioUnitParameterInfo paramInfo;
+    UInt32 paramInfoSize = sizeof(AudioUnitParameterInfo);
+    bool hasLinkedParam = false;
+    for (UInt32 i = 0; i < paramCount; i++) {
+        AudioUnitParameterID paramId = paramIds[i];
+
         AUDIO_UNIT_GET(audioUnit,
-                ParameterList,
+                ParameterInfo,
                 Global,
-                0,
-                paramIds.get(),
-                &paramListBytes);
+                paramId,
+                &paramInfo,
+                &paramInfoSize);
 
-        // Resolve parameters
-        AudioUnitParameterInfo paramInfo;
-        UInt32 paramInfoSize = sizeof(AudioUnitParameterInfo);
-        bool hasLinkedParam = false;
-        for (UInt32 i = 0; i < paramCount; i++) {
-            AudioUnitParameterID paramId = paramIds[i];
+        QString paramName = QString::fromUtf8(paramInfo.name);
+        auto paramFlags = paramInfo.flags;
 
-            AUDIO_UNIT_GET(audioUnit,
-                    ParameterInfo,
-                    Global,
-                    paramId,
-                    &paramInfo,
-                    &paramInfoSize);
+        qDebug() << QString::fromNSString([component name]) << "has parameter"
+                 << paramName;
 
-            QString paramName = QString::fromUtf8(paramInfo.name);
-            auto paramFlags = paramInfo.flags;
+        // TODO: Check CanRamp too?
+        if (paramFlags & kAudioUnitParameterFlag_IsWritable) {
+            EffectManifestParameterPointer manifestParam = addParameter();
+            manifestParam->setId(QString::number(paramId));
+            manifestParam->setName(paramName);
+            manifestParam->setRange(paramInfo.minValue,
+                    paramInfo.defaultValue,
+                    paramInfo.maxValue);
 
-            qDebug() << QString::fromNSString([component name])
-                     << "has parameter" << paramName;
+            // Link the first parameter
+            // TODO: Figure out if AU plugins provide a better way to figure
+            // out the "default" parameter
+            if (!hasLinkedParam) {
+                manifestParam->setDefaultLinkType(
+                        EffectManifestParameter::LinkType::Linked);
+                hasLinkedParam = true;
+            }
 
-            // TODO: Check CanRamp too?
-            if (paramFlags & kAudioUnitParameterFlag_IsWritable) {
-                EffectManifestParameterPointer manifestParam = addParameter();
-                manifestParam->setId(QString::number(paramId));
-                manifestParam->setName(paramName);
-                manifestParam->setRange(paramInfo.minValue,
-                        paramInfo.defaultValue,
-                        paramInfo.maxValue);
-
-                // Link the first parameter
-                // TODO: Figure out if AU plugins provide a better way to figure
-                // out the "default" parameter
-                if (!hasLinkedParam) {
-                    manifestParam->setDefaultLinkType(
-                            EffectManifestParameter::LinkType::Linked);
-                    hasLinkedParam = true;
-                }
-
-                // TODO: Support more modes, e.g. squared, square root in Mixxx
-                if (paramFlags & kAudioUnitParameterFlag_DisplayLogarithmic) {
-                    manifestParam->setValueScaler(
-                            EffectManifestParameter::ValueScaler::Logarithmic);
-                } else {
-                    manifestParam->setValueScaler(
-                            EffectManifestParameter::ValueScaler::Linear);
-                }
+            // TODO: Support more modes, e.g. squared, square root in Mixxx
+            if (paramFlags & kAudioUnitParameterFlag_DisplayLogarithmic) {
+                manifestParam->setValueScaler(
+                        EffectManifestParameter::ValueScaler::Logarithmic);
+            } else {
+                manifestParam->setValueScaler(
+                        EffectManifestParameter::ValueScaler::Linear);
             }
         }
     }

@@ -47,6 +47,17 @@ AudioUnit _Nullable AudioUnitManager::getAudioUnit() {
     return m_audioUnit;
 }
 
+AudioUnit _Nullable AudioUnitManager::waitForAudioUnit(
+        unsigned long timeoutMs) {
+    // Here, unlike getAudioUnit, we can use a mutex, because this is not
+    // to be called from the real-time thread.
+    const QMutexLocker locker(&m_mutex);
+    while (m_audioUnit == nil) {
+        m_condition.wait(&m_mutex, timeoutMs);
+    }
+    return getAudioUnit();
+}
+
 void AudioUnitManager::instantiateAudioUnitAsync(
         AVAudioUnitComponent* _Nonnull component, bool inProcess) {
     auto options = kAudioComponentInstantiation_LoadOutOfProcess;
@@ -112,6 +123,10 @@ void AudioUnitManager::initializeWith(AudioUnit _Nonnull audioUnit) {
         return;
     }
 
+    const QMutexLocker locker(&m_mutex);
     m_audioUnit = audioUnit;
+    // We use an atomic boolean so getAudioUnit can be called from the
+    // real-time thread. The condition is used by waitForAudioUnit.
     m_isInstantiated.store(true);
+    m_condition.wakeAll();
 }
