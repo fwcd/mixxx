@@ -4,7 +4,9 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import <CoreAudioTypes/CoreAudioTypes.h>
 
+#include <QMutex>
 #include <QString>
+#include <QWaitCondition>
 
 enum AudioUnitInstantiationType {
     Sync,
@@ -30,8 +32,15 @@ class AudioUnitManager {
     /// want to e.g. block on a mutex.
     AudioUnit _Nullable getAudioUnit();
 
+    /// Wait for the audio unit to be instantiated.
+    ///
+    /// Blocking and not to be used from a real-time context.
+    AudioUnit _Nullable waitForAudioUnit(unsigned long timeoutMs);
+
   private:
     QString m_name;
+    QMutex m_mutex;
+    QWaitCondition m_condition;
     std::atomic<bool> m_isInstantiated;
     AudioUnit _Nullable m_audioUnit;
 
