@@ -24,19 +24,13 @@ AudioUnitManifest::AudioUnitManifest(
     AudioUnitManager manager{component};
 
     const int TIMEOUT_MS = 2000;
-
-    QElapsedTimer timer;
-    timer.start();
-
-    while (manager.getAudioUnit() == nil) {
-        if (timer.elapsed() > TIMEOUT_MS) {
-            qWarning() << name() << "took more than" << TIMEOUT_MS
-                       << "ms to initialize, skipping manifest initialization "
-                          "for this effect. This means this effect will not "
-                          "display any parameters and likely not be useful!";
-            return;
-        }
-        QThread::msleep(10);
+    if (!manager.waitForAudioUnit(TIMEOUT_MS)) {
+        qWarning()
+                << name() << "took more than" << TIMEOUT_MS
+                << "ms to initialize, skipping manifest initialization for "
+                   "this Audio Unit effect. This means that this effect will "
+                   "not display any parameters and likely not be useful!";
+        return;
     }
 
     AudioUnit audioUnit = manager.getAudioUnit();
