@@ -1,14 +1,16 @@
 #import <AVFAudio/AVFAudio.h>
 #import <AudioToolbox/AudioToolbox.h>
-#include "util/assert.h"
+#import <dispatch/dispatch.h>
 
 #include <QString>
 
 #include "effects/backends/audiounit/audiounitmanager.h"
+#include "util/assert.h"
 
 AudioUnitManager::AudioUnitManager(AVAudioUnitComponent* _Nullable component,
         AudioUnitInstantiationType instantiationType)
-        : m_name(QString::fromNSString([component name])) {
+        : m_name(QString::fromNSString([component name])),
+          m_instantiationGroup(dispatch_group_create()) {
     // NOTE: The component can be null if the lookup failed in
     // `AudioUnitBackend::createProcessor`, in which case the effect simply acts
     // as an identity function on the audio. Same applies when
@@ -16,6 +18,8 @@ AudioUnitManager::AudioUnitManager(AVAudioUnitComponent* _Nullable component,
     if (!component) {
         return;
     }
+
+    dispatch_group_enter(m_instantiationGroup);
 
     switch (instantiationType) {
     case Sync:
@@ -114,4 +118,10 @@ void AudioUnitManager::initializeWith(AudioUnit _Nonnull audioUnit) {
 
     m_audioUnit = audioUnit;
     m_isInstantiated.store(true);
+    dispatch_group_leave(m_instantiationGroup);
+}
+
+bool AudioUnitManager::waitForAudioUnit(int timeoutMs) {
+    return dispatch_group_wait(m_instantiationGroup,
+                   dispatch_time(DISPATCH_TIME_NOW, timeoutMs * 1000000)) == 0;
 }
