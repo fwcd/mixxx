@@ -1,13 +1,11 @@
 #import <AudioToolbox/AudioToolbox.h>
-#include "effects/backends/effectmanifestparameter.h"
 
-#include <QElapsedTimer>
-#include <QThread>
 #include <memory>
 
 #include "effects/backends/audiounit/audiounitmanager.h"
 #include "effects/backends/audiounit/audiounitmanifest.h"
 #include "effects/backends/audiounit/audiounitutils.h"
+#include "effects/backends/effectmanifestparameter.h"
 #include "effects/defs.h"
 
 AudioUnitManifest::AudioUnitManifest(
