@@ -3471,9 +3471,16 @@ if(Qt_IS_STATIC)
       Qt${QT_VERSION_MAJOR}::QSvgPlugin
       # sqldrivers
       Qt${QT_VERSION_MAJOR}::QSQLiteDriverPlugin
-      # network plugins
-      Qt${QT_VERSION_MAJOR}::QTlsBackendOpenSSLPlugin
   )
+
+  if(NOT IOS)
+    target_link_libraries(
+      mixxx-lib
+      PRIVATE
+        # network plugins
+        Qt${QT_VERSION_MAJOR}::QTlsBackendOpenSSLPlugin
+    )
+  endif()
 
   if(EMSCRIPTEN)
     target_link_libraries(
@@ -3570,14 +3577,16 @@ else()
         applocal
     )
 
-    install(
-      IMPORTED_RUNTIME_ARTIFACTS
-        Qt${QT_VERSION_MAJOR}::QTlsBackendOpenSSLPlugin
-        DESTINATION
-        "${MIXXX_INSTALL_DATADIR}/tls"
-        COMPONENT
-        applocal
-    )
+    if(NOT IOS)
+      install(
+        IMPORTED_RUNTIME_ARTIFACTS
+          Qt${QT_VERSION_MAJOR}::QTlsBackendOpenSSLPlugin
+          DESTINATION
+          "${MIXXX_INSTALL_DATADIR}/tls"
+          COMPONENT
+          applocal
+      )
+    endif()
 
     if(QML)
       install(
